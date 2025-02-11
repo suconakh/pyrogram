@@ -197,7 +197,7 @@ class Client(Methods):
 
         max_message_cache_size (``int``, *optional*):
             Set the maximum size of the message cache.
-            Defaults to 10000.
+            Defaults to 1000.
 
         storage_engine (:obj:`~pyrogram.storage.Storage`, *optional*):
             Pass an instance of your own implementation of session storage engine.
@@ -359,15 +359,6 @@ class Client(Methods):
         self.last_update_time = datetime.now()
 
         self.loop = asyncio.get_event_loop()
-
-    def __enter__(self):
-        return self.start()
-
-    def __exit__(self, *args):
-        try:
-            self.stop()
-        except ConnectionError:
-            pass
 
     async def __aenter__(self):
         return await self.start()
@@ -1243,7 +1234,7 @@ class Client(Methods):
     def guess_mime_type(self, filename: Union[str, BytesIO]) -> Optional[str]:
         if isinstance(filename, BytesIO):
             return self.mimetypes.guess_type(filename.name)[0]
-            
+
         return self.mimetypes.guess_type(filename)[0]
 
     def guess_extension(self, mime_type: str) -> Optional[str]:

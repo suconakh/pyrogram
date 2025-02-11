@@ -59,29 +59,10 @@ class Run:
                 app = Client("my_account")
                 ...  # Set handlers up
                 app.run()
-
-            .. code-block:: python
-
-                from pyrogram import Client
-
-                app = Client("my_account")
-
-
-                async def main():
-                    async with app:
-                        print(await app.get_me())
-
-
-                app.run(main())
         """
         loop = asyncio.get_event_loop()
         run = loop.run_until_complete
 
-        if inspect.iscoroutinefunction(self.start):
-            run(self.start(use_qr=use_qr, except_ids=except_ids))
-            run(idle())
-            run(self.stop())
-        else:
-            self.start(use_qr=use_qr, except_ids=except_ids)
-            run(idle())
-            self.stop()
+        run(self.start(use_qr=use_qr, except_ids=except_ids))
+        run(idle())
+        run(self.stop())
