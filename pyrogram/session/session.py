@@ -241,7 +241,7 @@ class Session:
                                                     "Most likely the client time has to be synchronized.")
             except SecurityCheckMismatch as e:
                 log.info("Discarding packet: %s", e)
-                await self.connection.close()
+                await self.connection.close(f"Discarded packet due to security check mismatch: {e}")
                 return
             else:
                 bisect.insort(self.stored_msg_ids, msg.msg_id)
@@ -286,6 +286,7 @@ class Session:
             try:
                 await asyncio.wait_for(self.ping_task_event.wait(), self.PING_INTERVAL)
             except asyncio.TimeoutError:
+                log.warning("Got timeout error in ping task")
                 pass
             else:
                 break
@@ -299,7 +300,8 @@ class Session:
             except OSError:
                 self.loop.create_task(self.restart())
                 break
-            except RPCError:
+            except RPCError as error:
+                log.warning("Got rpc error in ping task: %s", error)
                 pass
 
         log.info("PingTask stopped")

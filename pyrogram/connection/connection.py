@@ -36,7 +36,7 @@ class Connection:
         ipv6: bool,
         proxy: dict,
         media: bool = False,
-        protocol_factory: Type[TCP] = TCPAbridged
+        protocol_factory: Type[TCP] = TCPAbridged,
     ) -> None:
         self.dc_id = dc_id
         self.test_mode = test_mode
@@ -60,19 +60,24 @@ class Connection:
                 await self.protocol.close()
                 await asyncio.sleep(1)
             else:
-                log.info("Connected! %s DC%s%s - IPv%s",
-                         "Test" if self.test_mode else "Production",
-                         self.dc_id,
-                         " (media)" if self.media else "",
-                         "6" if self.ipv6 else "4")
+                log.info(
+                    "Connected! %s DC%s%s - IPv%s",
+                    "Test" if self.test_mode else "Production",
+                    self.dc_id,
+                    " (media)" if self.media else "",
+                    "6" if self.ipv6 else "4",
+                )
                 break
         else:
             log.warning("Connection failed! Trying again...")
             raise ConnectionError
 
-    async def close(self) -> None:
+    async def close(self, reason: str | None = None) -> None:
         await self.protocol.close()
-        log.info("Disconnected")
+        if reason:
+            log.info("Disconnected (connection) due to: %s", reason)
+        else:
+            log.info("Disconnected")
 
     async def send(self, data: bytes) -> None:
         await self.protocol.send(data)
