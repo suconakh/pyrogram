@@ -286,7 +286,6 @@ class Session:
             try:
                 await asyncio.wait_for(self.ping_task_event.wait(), self.PING_INTERVAL)
             except asyncio.TimeoutError:
-                log.warning("Got timeout error in ping task")
                 pass
             else:
                 break
